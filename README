@@ -1,4 +1,4 @@
-The ruby script wordStats.rb is a simple command line script that takes input text files and returns some simple statistics on the data within. 
+The ruby script wordStats.rb is a command line script that takes input text files and returns some simple statistics on the data within. 
 The purpose of this script is to be a simple test-case for a future rails web service version.
 
 Usage: wordStats.rb [options] file1 file2...
