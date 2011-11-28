@@ -19,6 +19,11 @@ optparse = OptionParser.new do |opts|
   opts.on( '-w', '--word-length N', Integer, 'Minimum word length (Integer > 1)' ) do |w|
     options[:minWordLength] = w
   end
+  
+  options[:minOccurences] = 2
+  opts.on( '-o', '--occurences N', Integer, 'Minimum number of occurences (Default: 2)' ) do |o|
+    options[:minOccurences] = o
+  end
 
   opts.on( '-h', '--help', 'Display this screen' ) do
     puts opts
@@ -33,6 +38,8 @@ if ARGV.length == 0
   exit
 end
 
+totalTime = Benchmark.realtime do
+
 ARGV.each do |filename|
   numLines = 0
   numChars = 0
@@ -40,13 +47,15 @@ ARGV.each do |filename|
   wordDist = []
   begin
     timeElapsed = Benchmark.realtime do
-    f = File.open(filename,'r')
-      puts "Performing letter/word statistics on file '#{filename}'"
-      puts "Number of characters per line: " if options[:verbose]
+      f = File.open(filename,'r')
+      puts "--- #{filename}"
+      puts "Performing letter/word statistics on file '#{filename}'" if options[:verbose]
+      puts "Number of characters per line: "
       while line = f.gets
         line.chomp! # Remove trailing endline character \n
         if options[:verbose]
-          puts "#{line.length} : #{line}"
+          puts "------------------------------------------------------"
+          puts "ORIG #{line.length} chars: #{line}"
         else
           print "#{line.length} "
         end
@@ -54,30 +63,33 @@ ARGV.each do |filename|
         numChars += line.length
         if line.length > 0
           cleanLine = line.scan(/[A-Za-z](?:\w)+|(?:[A-Za-z]\.)+[A-Za-z]?/)
-          puts "#{cleanLine.length} words :: #{cleanLine.join(' ')}" if options[:verbose]
+          cleanLine.reject! {|word| word.length < options[:minWordLength]} if options[:minWordLength]
+          puts "CLEAN #{cleanLine.length} words :: #{cleanLine.join(' ')}" if options[:verbose]
           cleanLine.each do |word|
             words[word] += 1
           end
         end
       end # line fgets
       f.close
-      # Word distribution
-      words.reject! {|k,v| v <= 1} # remove single occurrences
-      words.reject! {|k,v| k.length <= options[:minWordLength]} if options[:minWordLength]
+      # Word distribution culling
+      words.reject! {|k,v| v < options[:minOccurences]} # remove single occurrences
       wordDist = words.to_a.sort{|x,y| y[1] <=> x[1]} # Sort big-small by occurrences
     end # Benchmark
     puts
     puts "Number of lines: #{numLines}, Number of characters: #{numChars}"
-    puts "Word count (2+ occurences, ignore single-letter words):"
-    if wordDist.length < 10 or options[:verbose]
+    puts "Word count (#{options[:minOccurences]}+ occurences, ignore single-letter words):"
+    if options[:verbose]
       wordDist.each {|k,v| puts "#{k} : #{v}"}
     else
-      wordDist[0..10].each {|k,v| print "#{k} : #{v}, "}
-      puts
+      puts wordDist[0..[10,wordDist.length-1].min].map {|k,v| "#{k} : #{v}"} .join(", ")
     end
     puts "Time elapsed: #{timeElapsed}s"
-    puts "Finished reading file '#{filename}'\n\n"
   rescue => err
     puts "#{err}, Skipping..."
   end
 end
+
+end # totalTime Benchmark
+
+puts "---"
+puts "Finished : #{ARGV.length} Files processed in #{totalTime}s"
