@@ -14,6 +14,11 @@ optparse = OptionParser.new do |opts|
   opts.on( '-v', '--verbose', 'Output more information' ) do
     options[:verbose] = true
   end
+  
+  options[:minWordLength] = nil
+  opts.on( '-w', '--word-length N', Integer, 'Minimum word length (Integer > 1)' ) do |w|
+    options[:minWordLength] = w
+  end
 
   opts.on( '-h', '--help', 'Display this screen' ) do
     puts opts
@@ -58,13 +63,18 @@ ARGV.each do |filename|
       f.close
       # Word distribution
       words.reject! {|k,v| v <= 1} # remove single occurrences
+      words.reject! {|k,v| k.length <= options[:minWordLength]} if options[:minWordLength]
       wordDist = words.to_a.sort{|x,y| y[1] <=> x[1]} # Sort big-small by occurrences
     end # Benchmark
     puts
     puts "Number of lines: #{numLines}, Number of characters: #{numChars}"
     puts "Word count (2+ occurences, ignore single-letter words):"
-    wordDist.each {|k,v| puts "#{k} : #{v}"}
-    puts "Most frequent word: #{words.key(words.values.max)}"
+    if wordDist.length < 10 or options[:verbose]
+      wordDist.each {|k,v| puts "#{k} : #{v}"}
+    else
+      wordDist[0..10].each {|k,v| print "#{k} : #{v}, "}
+      puts
+    end
     puts "Time elapsed: #{timeElapsed}s"
     puts "Finished reading file '#{filename}'\n\n"
   rescue => err
