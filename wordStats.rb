@@ -24,6 +24,11 @@ optparse = OptionParser.new do |opts|
   opts.on( '-o', '--occurences N', Integer, 'Minimum number of occurences (Default: 2)' ) do |o|
     options[:minOccurences] = o
   end
+  
+  options[:interactive] = false
+  opts.on( '-i', '--interactive', 'Script pauses between each file' ) do |o|
+    options[:interactive] = true
+  end
 
   opts.on( '-h', '--help', 'Display this screen' ) do
     puts opts
@@ -84,6 +89,7 @@ ARGV.each do |filename|
       puts wordDist[0..[10,wordDist.length-1].min].map {|k,v| "#{k} : #{v}"} .join(", ")
     end
     puts "Time elapsed: #{timeElapsed}s"
+    (puts "\nPress ENTER to continue..."; $stdin.gets) if options[:interactive] 
   rescue => err
     puts "#{err}, Skipping..."
   end
@@ -92,4 +98,4 @@ end
 end # totalTime Benchmark
 
 puts "---"
-puts "Finished : #{ARGV.length} Files processed in #{totalTime}s"
+puts "Finished : #{ARGV.length} Files processed in #{totalTime}s" if not options[:interactive] 
