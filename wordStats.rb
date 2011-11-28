@@ -32,6 +32,7 @@ ARGV.each do |filename|
   numLines = 0
   numChars = 0
   words = Hash.new(0)
+  wordDist = []
   begin
     timeElapsed = Benchmark.realtime do
     f = File.open(filename,'r')
@@ -53,14 +54,16 @@ ARGV.each do |filename|
             words[word] += 1
           end
         end
-        puts 
-      end
+      end # line fgets
       f.close
-    end
+      # Word distribution
+      words.reject! {|k,v| v <= 1} # remove single occurrences
+      wordDist = words.to_a.sort{|x,y| y[1] <=> x[1]} # Sort big-small by occurrences
+    end # Benchmark
     puts
     puts "Number of lines: #{numLines}, Number of characters: #{numChars}"
-    words.reject! {|k,v| v <= 1}
-    puts "Word count (2+ occurences, ignore single-letter words): #{words}"
+    puts "Word count (2+ occurences, ignore single-letter words):"
+    wordDist.each {|k,v| puts "#{k} : #{v}"}
     puts "Most frequent word: #{words.key(words.values.max)}"
     puts "Time elapsed: #{timeElapsed}s"
     puts "Finished reading file '#{filename}'\n\n"
