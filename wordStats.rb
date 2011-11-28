@@ -31,15 +31,19 @@ ARGV.each do |filename|
   begin
     f = File.open(filename,'r')
     puts "Performing letter/word statistics on file '#{filename}'"
+    puts "Number of characters per line: " if options[:verbose]
     while line = f.gets
-      puts line
-      puts line.length
+      if options[:verbose]
+        puts "#{line.length} : #{line}"
+      else
+        print "#{line.length} "
+      end
       numLines += 1
     end
     f.close
-    
+    puts
     puts "Number of lines: #{numLines}"
-    puts "Finished reading file '#{filename}'"
+    puts "Finished reading file '#{filename}'\n\n"
   rescue => err
     puts "#{err}, Skipping..."
   end
