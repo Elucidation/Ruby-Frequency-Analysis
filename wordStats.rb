@@ -40,6 +40,7 @@ optparse.parse!
 
 if ARGV.length == 0
   puts optparse.banner
+  puts "Example usage: ./wordStats.rb *.txt -w 3 -o 10"
   exit
 end
 
