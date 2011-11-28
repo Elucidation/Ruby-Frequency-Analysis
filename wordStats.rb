@@ -3,6 +3,7 @@
 # Returns some statistics on letters and/or words used
 
 require 'optparse'
+require 'benchmark'
 
 ## OPTIONS
 options = {}
@@ -26,23 +27,29 @@ if ARGV.length == 0
   puts optparse.banner
   exit
 end
+
 ARGV.each do |filename|
   numLines = 0
+  numChars = 0
   begin
+    timeElapsed = Benchmark.realtime do
     f = File.open(filename,'r')
-    puts "Performing letter/word statistics on file '#{filename}'"
-    puts "Number of characters per line: " if options[:verbose]
-    while line = f.gets
-      if options[:verbose]
-        puts "#{line.length} : #{line}"
-      else
-        print "#{line.length} "
+      puts "Performing letter/word statistics on file '#{filename}'"
+      puts "Number of characters per line: " if options[:verbose]
+      while line = f.gets
+        if options[:verbose]
+          puts "#{line.length} : #{line}"
+        else
+          print "#{line.length} "
+        end
+        numLines += 1
+        numChars += line.length
       end
-      numLines += 1
+      f.close
     end
-    f.close
     puts
-    puts "Number of lines: #{numLines}"
+    puts "Number of lines: #{numLines}, Number of characters: #{numChars}"
+    puts "Time elapsed: #{timeElapsed}s"
     puts "Finished reading file '#{filename}'\n\n"
   rescue => err
     puts "#{err}, Skipping..."
