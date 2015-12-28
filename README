@@ -1,3 +1,5 @@
+# Ruby Frequency Analysis [![Build Status](https://travis-ci.org/Elucidation/Ruby-Frequency-Analysis.svg?branch=master)](https://travis-ci.org/Elucidation/Ruby-Frequency-Analysis)
+
 The ruby script wordStats.rb is a command line script that takes input text files and returns some simple statistics on the data within. 
 The purpose of this script is to be a simple test-case for a future rails web service version.
 
