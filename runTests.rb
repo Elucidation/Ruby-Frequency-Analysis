@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # File:  tc_simple_number.rb
 require_relative "countWords"
-require "test/unit"
+require "minitest/autorun"
 
 # Helper function to create and write a test file quickly
 def createTempFile(filename, data)
@@ -10,7 +10,7 @@ def createTempFile(filename, data)
     f.close
 end
 
-class TestCountWords < Test::Unit::TestCase
+class TestCountWords < Minitest::Unit::TestCase
  
   def test_simple
     filename = '/tmp/test_simple.txt'
